@@ -16,18 +16,31 @@ import androidx.compose.material.icons.outlined.MeetingRoom
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.moviles.unaroom.ui.components.AppButton
 import com.moviles.unaroom.ui.components.AppTextField
+import com.moviles.unaroom.ui.theme.AppBackground
+import com.moviles.unaroom.ui.theme.AppError
 import com.moviles.unaroom.ui.theme.AppPrimary
 import com.moviles.unaroom.ui.theme.AppSecondaryText
 import com.moviles.unaroom.ui.theme.AppSurfaceVariant
+import kotlinx.coroutines.launch
 
 @Composable
 private fun LoginHeader() {
@@ -119,13 +132,75 @@ fun LoginScreen(
     onLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+                Snackbar(
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+                    containerColor = AppError,
+                    contentColor = AppBackground,
+                    dismissActionContentColor = AppBackground,
+                    shape = RoundedCornerShape(18.dp),
+                    snackbarData = snackbarData
+                )
+            }
+        }
     ) {
-        LoginHeader()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(horizontal = 26.dp, vertical = 24.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                LoginHeader()
+                Spacer(modifier = Modifier.height(56.dp))
+                EmailTextField(
+                    value = email,
+                    onValueChange = { email = it }
+                )
+                Spacer(modifier = Modifier.height(22.dp))
+                PasswordTextField(
+                    value = password,
+                    onValueChange = { password = it }
+                )
+                Spacer(modifier = Modifier.height(22.dp))
+                LoginButton(
+                    onClick = {
+                        if (email.isBlank() || password.isBlank()) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "Please fill in all fields",
+                                    withDismissAction = true
+                                )
+                            }
+                        } else {
+                            onLoginClick()
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(34.dp))
+                Text(
+                    text = "Demo: Use any email and password",
+                    color = AppSecondaryText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }
 
