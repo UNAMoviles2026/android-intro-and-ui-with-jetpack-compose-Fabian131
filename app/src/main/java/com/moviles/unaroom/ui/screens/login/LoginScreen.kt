@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.moviles.unaroom.ui.components.AppButton
 import com.moviles.unaroom.ui.components.AppTextField
 import com.moviles.unaroom.ui.theme.AppPrimary
 import com.moviles.unaroom.ui.theme.AppSecondaryText
@@ -98,6 +99,18 @@ fun PasswordTextField(
         modifier = modifier,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation = PasswordVisualTransformation()
+    )
+}
+
+@Composable
+fun LoginButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AppButton(
+        text = "Login",
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth()
     )
 }
 
